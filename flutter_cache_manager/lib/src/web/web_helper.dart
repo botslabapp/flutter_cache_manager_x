@@ -33,6 +33,7 @@ class WebHelper {
   final FileService fileFetcher;
   final Map<String, BehaviorSubject<FileResponse>> _memCache;
   final Queue<QueueItem> _queue = Queue();
+  bool useStackMode = false;
 
   ///Download the file from the url
   Stream<FileResponse> downloadFile(String url,
@@ -57,7 +58,11 @@ class WebHelper {
   ) async {
     //Add to queue if there are too many calls.
     if (concurrentCalls >= fileFetcher.concurrentFetches) {
-      _queue.add(QueueItem(url, key, authHeaders));
+      if(useStackMode){
+        _queue.addFirst(QueueItem(url, key, authHeaders));
+      }else{
+        _queue.add(QueueItem(url, key, authHeaders));
+      }
       return;
     }
 
